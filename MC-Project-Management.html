@@ -20,8 +20,7 @@
     <div style="width:36px;height:36px;border:3px solid #3B82F6;border-top-color:transparent;border-radius:50%;animation:spin .8s linear infinite"></div>
     <div style="font-size:14px">Loading MC Project Management...</div>
   </div></div>
-  <script>
-    const {useState,useEffect,useRef,useCallback}=React;
+  <script>const {useState,useEffect,useRef,useCallback}=React;
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _regenerator() { /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/babel/babel/blob/main/packages/babel-helpers/LICENSE */ var e, t, r = "function" == typeof Symbol ? Symbol : {}, n = r.iterator || "@@iterator", o = r.toStringTag || "@@toStringTag"; function i(r, n, o, i) { var c = n && n.prototype instanceof Generator ? n : Generator, u = Object.create(c.prototype); return _regeneratorDefine2(u, "_invoke", function (r, n, o) { var i, c, u, f = 0, p = o || [], y = !1, G = { p: 0, n: 0, v: e, a: d, f: d.bind(e, 4), d: function d(t, r) { return i = t, c = 0, u = e, G.n = r, a; } }; function d(r, n) { for (c = r, u = n, t = 0; !y && f && !o && t < p.length; t++) { var o, i = p[t], d = G.p, l = i[2]; r > 3 ? (o = l === n) && (u = i[(c = i[4]) ? 5 : (c = 3, 3)], i[4] = i[5] = e) : i[0] <= d && ((o = r < 2 && d < i[1]) ? (c = 0, G.v = n, G.n = i[1]) : d < l && (o = r < 3 || i[0] > n || n > l) && (i[4] = r, i[5] = n, G.n = l, c = 0)); } if (o || r > 1) return a; throw y = !0, n; } return function (o, p, l) { if (f > 1) throw TypeError("Generator is already running"); for (y && 1 === p && d(p, l), c = p, u = l; (t = c < 2 ? e : u) || !y;) { i || (c ? c < 3 ? (c > 1 && (G.n = -1), d(c, u)) : G.n = u : G.v = u); try { if (f = 2, i) { if (c || (o = "next"), t = i[o]) { if (!(t = t.call(i, u))) throw TypeError("iterator result is not an object"); if (!t.done) return t; u = t.value, c < 2 && (c = 0); } else 1 === c && (t = i.return) && t.call(i), c < 2 && (u = TypeError("The iterator does not provide a '" + o + "' method"), c = 1); i = e; } else if ((t = (y = G.n < 0) ? u : r.call(n, G)) !== a) break; } catch (t) { i = e, c = 1, u = t; } finally { f = 1; } } return { value: t, done: y }; }; }(r, o, i), !0), u; } var a = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} t = Object.getPrototypeOf; var c = [][n] ? t(t([][n]())) : (_regeneratorDefine2(t = {}, n, function () { return this; }), t), u = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(c); function f(e) { return Object.setPrototypeOf ? Object.setPrototypeOf(e, GeneratorFunctionPrototype) : (e.__proto__ = GeneratorFunctionPrototype, _regeneratorDefine2(e, o, "GeneratorFunction")), e.prototype = Object.create(u), e; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, _regeneratorDefine2(u, "constructor", GeneratorFunctionPrototype), _regeneratorDefine2(GeneratorFunctionPrototype, "constructor", GeneratorFunction), GeneratorFunction.displayName = "GeneratorFunction", _regeneratorDefine2(GeneratorFunctionPrototype, o, "GeneratorFunction"), _regeneratorDefine2(u), _regeneratorDefine2(u, o, "Generator"), _regeneratorDefine2(u, n, function () { return this; }), _regeneratorDefine2(u, "toString", function () { return "[object Generator]"; }), (_regenerator = function _regenerator() { return { w: i, m: f }; })(); }
 function _regeneratorDefine2(e, r, n, t) { var i = Object.defineProperty; try { i({}, "", {}); } catch (e) { i = 0; } _regeneratorDefine2 = function _regeneratorDefine(e, r, n, t) { function o(r, n) { _regeneratorDefine2(e, r, function (e) { return this._invoke(r, n, e); }); } r ? i ? i(e, r, { value: n, enumerable: !t, configurable: !t, writable: !t }) : e[r] = n : (o("next", 0), o("throw", 1), o("return", 2)); }, _regeneratorDefine2(e, r, n, t); }
@@ -56,7 +55,7 @@ var sb = {
     return {
       select: function select() {
         var cols = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "*";
-        return fetch("".concat(SUPABASE_URL, "/rest/v1/").concat(table, "?select=").concat(cols), {
+        return fetch("".concat(SUPABASE_URL, "/rest/v1/").concat(table, "?select=").concat(cols, "&order=id"), {
           headers: hdrs()
         }).then(function (r) {
           return r.json();
@@ -3209,63 +3208,156 @@ function ManageTeamModal(_ref1) {
       capacity: mem.capacity
     });
   };
-  var saveEdit = function saveEdit() {
-    if (!editForm.name.trim()) return;
-    setMembers(function (prev) {
-      return prev.map(function (m) {
-        return m.id === editingId ? _objectSpread(_objectSpread(_objectSpread({}, m), editForm), {}, {
-          name: editForm.name.trim(),
-          avatar: editForm.avatar || getAvatar(editForm.name),
-          teams: editForm.teams || []
-        }) : m;
-      });
-    });
-    toast("✏️", "Member Updated", editForm.name);
-    setEditingId(null);
-  };
-  var deleteMember = function deleteMember(id) {
-    var hasTasks = tasks.filter(function (t) {
-      return t.assigneeId === id || (t.assigneeIds || []).includes(id);
-    }).length > 0;
-    if (hasTasks) {
-      toast("⚠️", "Cannot Delete", "This member has assigned tasks.");
-      return;
-    }
-    setMembers(function (prev) {
-      return prev.filter(function (m) {
-        return m.id !== id;
-      });
-    });
-    toast("🗑", "Member Removed", "");
-  };
-  var addMember = function addMember() {
-    if (!newForm.name.trim()) return;
-    var id = Date.now();
-    setMembers(function (prev) {
-      return [].concat(_toConsumableArray(prev), [{
-        id: id,
-        name: newForm.name.trim(),
-        avatar: newForm.avatar || getAvatar(newForm.name),
-        color: newForm.color,
-        capacity: newForm.capacity || 40,
-        teams: newForm.teams || []
-      }]);
-    });
-    toast("✅", "Member Added", newForm.name);
-    setNewForm({
-      name: "",
-      avatar: "",
-      color: "#3B82F6",
-      capacity: 40
-    });
-    setShowAdd(false);
-  };
-  var MemberForm = function MemberForm(_ref10) {
-    var form = _ref10.form,
-      setForm = _ref10.setForm,
-      onSave = _ref10.onSave,
-      onCancel = _ref10.onCancel,
-      isNew = _ref10.isNew;
+  var saveEdit = /*#__PURE__*/function () {
+    var _ref10 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee() {
+      var updated, _t;
+      return _regenerator().w(function (_context) {
+        while (1) switch (_context.p = _context.n) {
+          case 0:
+            if (editForm.name.trim()) {
+              _context.n = 1;
+              break;
+            }
+            return _context.a(2);
+          case 1:
+            updated = {
+              name: editForm.name.trim(),
+              avatar: editForm.avatar || getAvatar(editForm.name),
+              color: editForm.color,
+              capacity: editForm.capacity || 40,
+              teams: editForm.teams || []
+            };
+            setMembers(function (prev) {
+              return prev.map(function (mem) {
+                return mem.id === editingId ? _objectSpread(_objectSpread({}, mem), updated) : mem;
+              });
+            });
+            toast("✏️", "Member Updated", editForm.name);
+            setEditingId(null);
+            _context.p = 2;
+            _context.n = 3;
+            return sb.from("members").update(updated).eq("id", editingId);
+          case 3:
+            _context.n = 5;
+            break;
+          case 4:
+            _context.p = 4;
+            _t = _context.v;
+            console.error("Save member error:", _t);
+          case 5:
+            return _context.a(2);
+        }
+      }, _callee, null, [[2, 4]]);
+    }));
+    return function saveEdit() {
+      return _ref10.apply(this, arguments);
+    };
+  }();
+  var deleteMember = /*#__PURE__*/function () {
+    var _ref11 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee2(id) {
+      var hasTasks, _t2;
+      return _regenerator().w(function (_context2) {
+        while (1) switch (_context2.p = _context2.n) {
+          case 0:
+            hasTasks = tasks.filter(function (t) {
+              return t.assigneeId === id || (t.assigneeIds || []).includes(id);
+            }).length > 0;
+            if (!hasTasks) {
+              _context2.n = 1;
+              break;
+            }
+            toast("⚠️", "Cannot Delete", "This member has assigned tasks.");
+            return _context2.a(2);
+          case 1:
+            setMembers(function (prev) {
+              return prev.filter(function (m) {
+                return m.id !== id;
+              });
+            });
+            toast("🗑", "Member Removed", "");
+            _context2.p = 2;
+            _context2.n = 3;
+            return sb.from("members").delete().eq("id", id);
+          case 3:
+            _context2.n = 5;
+            break;
+          case 4:
+            _context2.p = 4;
+            _t2 = _context2.v;
+          case 5:
+            return _context2.a(2);
+        }
+      }, _callee2, null, [[2, 4]]);
+    }));
+    return function deleteMember(_x) {
+      return _ref11.apply(this, arguments);
+    };
+  }();
+  var addMember = /*#__PURE__*/function () {
+    var _ref12 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee3() {
+      var newMem, rows, saved, _t3;
+      return _regenerator().w(function (_context3) {
+        while (1) switch (_context3.p = _context3.n) {
+          case 0:
+            if (newForm.name.trim()) {
+              _context3.n = 1;
+              break;
+            }
+            return _context3.a(2);
+          case 1:
+            newMem = {
+              name: newForm.name.trim(),
+              avatar: newForm.avatar || getAvatar(newForm.name),
+              color: newForm.color,
+              capacity: newForm.capacity || 40,
+              teams: newForm.teams || []
+            };
+            _context3.p = 2;
+            _context3.n = 3;
+            return sb.from("members").insert(newMem);
+          case 3:
+            rows = _context3.v;
+            saved = Array.isArray(rows) && rows[0] ? toMember(rows[0]) : _objectSpread(_objectSpread({}, newMem), {}, {
+              id: Date.now()
+            });
+            setMembers(function (prev) {
+              return [].concat(_toConsumableArray(prev), [saved]);
+            });
+            _context3.n = 5;
+            break;
+          case 4:
+            _context3.p = 4;
+            _t3 = _context3.v;
+            setMembers(function (prev) {
+              return [].concat(_toConsumableArray(prev), [_objectSpread(_objectSpread({}, newMem), {}, {
+                id: Date.now()
+              })]);
+            });
+          case 5:
+            toast("✅", "Member Added", newForm.name);
+            setNewForm({
+              name: "",
+              avatar: "",
+              color: "#3B82F6",
+              capacity: 40,
+              teams: []
+            });
+            setShowAdd(false);
+          case 6:
+            return _context3.a(2);
+        }
+      }, _callee3, null, [[2, 4]]);
+    }));
+    return function addMember() {
+      return _ref12.apply(this, arguments);
+    };
+  }();
+  var MemberForm = function MemberForm(_ref13) {
+    var form = _ref13.form,
+      setForm = _ref13.setForm,
+      onSave = _ref13.onSave,
+      onCancel = _ref13.onCancel,
+      isNew = _ref13.isNew;
     return /*#__PURE__*/React.createElement("div", {
       style: {
         background: m.bg2,
@@ -3737,16 +3829,16 @@ function ManageTeamModal(_ref1) {
 // ── Manage Spaces Modal ───────────────────────────────────
 var SPACE_COLORS = ["#E85D26", "#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6", "#EC4899", "#06B6D4", "#14B8A6", "#F97316", "#64748B", "#84CC16"];
 var COMMON_EMOJIS = ["📢", "✍️", "🛒", "⚙️", "🚀", "📊", "🎨", "💡", "🔧", "📱", "🌐", "📝", "💼", "🎯", "🏆", "🔍"];
-function ManageSpacesModal(_ref11) {
-  var projects = _ref11.projects,
-    setProjects = _ref11.setProjects,
-    tasks = _ref11.tasks,
-    m = _ref11.m,
-    cardStyle = _ref11.cardStyle,
-    inp = _ref11.inp,
-    onClose = _ref11.onClose,
-    setFilterProject = _ref11.setFilterProject,
-    toast = _ref11.toast;
+function ManageSpacesModal(_ref14) {
+  var projects = _ref14.projects,
+    setProjects = _ref14.setProjects,
+    tasks = _ref14.tasks,
+    m = _ref14.m,
+    cardStyle = _ref14.cardStyle,
+    inp = _ref14.inp,
+    onClose = _ref14.onClose,
+    setFilterProject = _ref14.setFilterProject,
+    toast = _ref14.toast;
   var _useState35 = useState(null),
     _useState36 = _slicedToArray(_useState35, 2),
     editingId = _useState36[0],
@@ -3780,56 +3872,147 @@ function ManageSpacesModal(_ref11) {
       color: p.color
     });
   };
-  var saveEdit = function saveEdit() {
-    if (!editForm.name.trim()) return;
-    setProjects(function (prev) {
-      return prev.map(function (p) {
-        return p.id === editingId ? _objectSpread(_objectSpread(_objectSpread({}, p), editForm), {}, {
-          name: editForm.name.trim()
-        }) : p;
-      });
-    });
-    toast("✏️", "Space Updated", editForm.name);
-    setEditingId(null);
-  };
-  var deleteSpace = function deleteSpace(id) {
-    if (tasks.filter(function (t) {
-      return t.projectId === id;
-    }).length > 0) {
-      toast("⚠️", "Cannot Delete", "This space has tasks. Move them first.");
-      return;
-    }
-    setProjects(function (prev) {
-      return prev.filter(function (p) {
-        return p.id !== id;
-      });
-    });
-    setFilterProject("all");
-    toast("🗑", "Space Deleted", "");
-  };
-  var addSpace = function addSpace() {
-    if (!newForm.name.trim()) return;
-    var id = Date.now();
-    setProjects(function (prev) {
-      return [].concat(_toConsumableArray(prev), [{
-        id: id,
-        name: newForm.name.trim(),
-        emoji: newForm.emoji,
-        color: newForm.color
-      }]);
-    });
-    toast("✅", "Space Created", newForm.name);
-    setNewForm({
-      name: "",
-      emoji: "📁",
-      color: "#3B82F6"
-    });
-    setShowAdd(false);
-  };
-  var EmojiPicker = function EmojiPicker(_ref12) {
-    var target = _ref12.target,
-      form = _ref12.form,
-      setForm = _ref12.setForm;
+  var saveEdit = /*#__PURE__*/function () {
+    var _ref15 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee4() {
+      var updated, _t4;
+      return _regenerator().w(function (_context4) {
+        while (1) switch (_context4.p = _context4.n) {
+          case 0:
+            if (editForm.name.trim()) {
+              _context4.n = 1;
+              break;
+            }
+            return _context4.a(2);
+          case 1:
+            updated = {
+              name: editForm.name.trim(),
+              emoji: editForm.emoji,
+              color: editForm.color
+            };
+            setProjects(function (prev) {
+              return prev.map(function (p) {
+                return p.id === editingId ? _objectSpread(_objectSpread({}, p), updated) : p;
+              });
+            });
+            toast("✏️", "Space Updated", editForm.name);
+            setEditingId(null);
+            _context4.p = 2;
+            _context4.n = 3;
+            return sb.from("projects").update(updated).eq("id", editingId);
+          case 3:
+            _context4.n = 5;
+            break;
+          case 4:
+            _context4.p = 4;
+            _t4 = _context4.v;
+          case 5:
+            return _context4.a(2);
+        }
+      }, _callee4, null, [[2, 4]]);
+    }));
+    return function saveEdit() {
+      return _ref15.apply(this, arguments);
+    };
+  }();
+  var deleteSpace = /*#__PURE__*/function () {
+    var _ref16 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee5(id) {
+      var _t5;
+      return _regenerator().w(function (_context5) {
+        while (1) switch (_context5.p = _context5.n) {
+          case 0:
+            if (!(tasks.filter(function (t) {
+              return t.projectId === id;
+            }).length > 0)) {
+              _context5.n = 1;
+              break;
+            }
+            toast("⚠️", "Cannot Delete", "This space has tasks. Move them first.");
+            return _context5.a(2);
+          case 1:
+            setProjects(function (prev) {
+              return prev.filter(function (p) {
+                return p.id !== id;
+              });
+            });
+            setFilterProject("all");
+            toast("🗑", "Space Deleted", "");
+            _context5.p = 2;
+            _context5.n = 3;
+            return sb.from("projects").delete().eq("id", id);
+          case 3:
+            _context5.n = 5;
+            break;
+          case 4:
+            _context5.p = 4;
+            _t5 = _context5.v;
+          case 5:
+            return _context5.a(2);
+        }
+      }, _callee5, null, [[2, 4]]);
+    }));
+    return function deleteSpace(_x2) {
+      return _ref16.apply(this, arguments);
+    };
+  }();
+  var addSpace = /*#__PURE__*/function () {
+    var _ref17 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee6() {
+      var newProj, rows, saved, _t6;
+      return _regenerator().w(function (_context6) {
+        while (1) switch (_context6.p = _context6.n) {
+          case 0:
+            if (newForm.name.trim()) {
+              _context6.n = 1;
+              break;
+            }
+            return _context6.a(2);
+          case 1:
+            newProj = {
+              name: newForm.name.trim(),
+              emoji: newForm.emoji,
+              color: newForm.color
+            };
+            _context6.p = 2;
+            _context6.n = 3;
+            return sb.from("projects").insert(newProj);
+          case 3:
+            rows = _context6.v;
+            saved = Array.isArray(rows) && rows[0] ? toProject(rows[0]) : _objectSpread(_objectSpread({}, newProj), {}, {
+              id: Date.now()
+            });
+            setProjects(function (prev) {
+              return [].concat(_toConsumableArray(prev), [saved]);
+            });
+            _context6.n = 5;
+            break;
+          case 4:
+            _context6.p = 4;
+            _t6 = _context6.v;
+            setProjects(function (prev) {
+              return [].concat(_toConsumableArray(prev), [_objectSpread(_objectSpread({}, newProj), {}, {
+                id: Date.now()
+              })]);
+            });
+          case 5:
+            toast("✅", "Space Created", newForm.name);
+            setNewForm({
+              name: "",
+              emoji: "📁",
+              color: "#3B82F6"
+            });
+            setShowAdd(false);
+          case 6:
+            return _context6.a(2);
+        }
+      }, _callee6, null, [[2, 4]]);
+    }));
+    return function addSpace() {
+      return _ref17.apply(this, arguments);
+    };
+  }();
+  var EmojiPicker = function EmojiPicker(_ref18) {
+    var target = _ref18.target,
+      form = _ref18.form,
+      setForm = _ref18.setForm;
     return /*#__PURE__*/React.createElement("div", {
       style: {
         position: "absolute",
@@ -3874,12 +4057,12 @@ function ManageSpacesModal(_ref11) {
       }, e);
     })));
   };
-  var FormRow = function FormRow(_ref13) {
-    var form = _ref13.form,
-      setForm = _ref13.setForm,
-      onSave = _ref13.onSave,
-      onCancel = _ref13.onCancel,
-      isNew = _ref13.isNew;
+  var FormRow = function FormRow(_ref19) {
+    var form = _ref19.form,
+      setForm = _ref19.setForm,
+      onSave = _ref19.onSave,
+      onCancel = _ref19.onCancel,
+      isNew = _ref19.isNew;
     return /*#__PURE__*/React.createElement("div", {
       style: {
         background: m.bg2,
@@ -4186,19 +4369,19 @@ function ManageSpacesModal(_ref11) {
 }
 
 // ── Workload Tab Component ────────────────────────────────
-function WorkloadTab(_ref14) {
-  var tasks = _ref14.tasks,
-    members = _ref14.members,
-    projects = _ref14.projects,
-    columns = _ref14.columns,
-    today = _ref14.today,
-    m = _ref14.m,
-    cardStyle = _ref14.cardStyle,
-    getWorkload = _ref14.getWorkload,
-    wlColor = _ref14.wlColor,
-    getProject = _ref14.getProject,
-    getColumn = _ref14.getColumn,
-    setEditTask = _ref14.setEditTask;
+function WorkloadTab(_ref20) {
+  var tasks = _ref20.tasks,
+    members = _ref20.members,
+    projects = _ref20.projects,
+    columns = _ref20.columns,
+    today = _ref20.today,
+    m = _ref20.m,
+    cardStyle = _ref20.cardStyle,
+    getWorkload = _ref20.getWorkload,
+    wlColor = _ref20.wlColor,
+    getProject = _ref20.getProject,
+    getColumn = _ref20.getColumn,
+    setEditTask = _ref20.setEditTask;
   var _useState45 = useState(null),
     _useState46 = _slicedToArray(_useState45, 2),
     selectedId = _useState46[0],
@@ -4916,12 +5099,12 @@ function App() {
   };
   var today = new Date().toISOString().slice(0, 10);
   useEffect(function () {
-    Promise.all([sb.from("tasks").select("*"), sb.from("members").select("*"), sb.from("projects").select("*"), sb.from("columns").select("*")]).then(function (_ref15) {
-      var _ref16 = _slicedToArray(_ref15, 4),
-        t = _ref16[0],
-        mem = _ref16[1],
-        proj = _ref16[2],
-        col = _ref16[3];
+    Promise.all([sb.from("tasks").select("*"), sb.from("members").select("*"), sb.from("projects").select("*"), sb.from("columns").select("*")]).then(function (_ref21) {
+      var _ref22 = _slicedToArray(_ref21, 4),
+        t = _ref22[0],
+        mem = _ref22[1],
+        proj = _ref22[2],
+        col = _ref22[3];
       if (Array.isArray(t) && t.length > 0) setTasks(t.map(toTask).filter(Boolean));
       if (Array.isArray(mem) && mem.length > 0) setMembers(mem.map(toMember).filter(Boolean));
       if (Array.isArray(proj) && proj.length > 0) setProjects(proj.map(toProject).filter(Boolean));
@@ -5023,10 +5206,10 @@ function App() {
     setShowAddTask(false);
   };
   var deleteTask = /*#__PURE__*/function () {
-    var _ref17 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee(id) {
-      var _t;
-      return _regenerator().w(function (_context) {
-        while (1) switch (_context.p = _context.n) {
+    var _ref23 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee7(id) {
+      var _t7;
+      return _regenerator().w(function (_context7) {
+        while (1) switch (_context7.p = _context7.n) {
           case 0:
             setTasks(function (p) {
               return p.filter(function (x) {
@@ -5035,29 +5218,29 @@ function App() {
             });
             toast("🗑", "Deleted", "Task removed");
             setEditTask(null);
-            _context.p = 1;
-            _context.n = 2;
+            _context7.p = 1;
+            _context7.n = 2;
             return sb.from("tasks").delete().eq("id", id);
           case 2:
-            _context.n = 4;
+            _context7.n = 4;
             break;
           case 3:
-            _context.p = 3;
-            _t = _context.v;
+            _context7.p = 3;
+            _t7 = _context7.v;
           case 4:
-            return _context.a(2);
+            return _context7.a(2);
         }
-      }, _callee, null, [[1, 3]]);
+      }, _callee7, null, [[1, 3]]);
     }));
-    return function deleteTask(_x) {
-      return _ref17.apply(this, arguments);
+    return function deleteTask(_x3) {
+      return _ref23.apply(this, arguments);
     };
   }();
   var saveEdit = /*#__PURE__*/function () {
-    var _ref18 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee2() {
-      var _t2;
-      return _regenerator().w(function (_context2) {
-        while (1) switch (_context2.p = _context2.n) {
+    var _ref24 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee8() {
+      var _t8;
+      return _regenerator().w(function (_context8) {
+        while (1) switch (_context8.p = _context8.n) {
           case 0:
             setTasks(function (p) {
               return p.map(function (x) {
@@ -5066,22 +5249,22 @@ function App() {
             });
             toast("💾", "Saved", editTask.title);
             setEditTask(null);
-            _context2.p = 1;
-            _context2.n = 2;
+            _context8.p = 1;
+            _context8.n = 2;
             return sb.from("tasks").update(fromTask(editTask)).eq("id", editTask.id);
           case 2:
-            _context2.n = 4;
+            _context8.n = 4;
             break;
           case 3:
-            _context2.p = 3;
-            _t2 = _context2.v;
+            _context8.p = 3;
+            _t8 = _context8.v;
           case 4:
-            return _context2.a(2);
+            return _context8.a(2);
         }
-      }, _callee2, null, [[1, 3]]);
+      }, _callee8, null, [[1, 3]]);
     }));
     return function saveEdit() {
-      return _ref18.apply(this, arguments);
+      return _ref24.apply(this, arguments);
     };
   }();
   var startEditCol = function startEditCol(col) {
@@ -7308,6 +7491,6 @@ function App() {
   })));
 }
 
-    ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+  ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
   </script>
 </body></html>
