@@ -5098,21 +5098,22 @@ function App() {
     }, 3000);
   };
   var today = new Date().toISOString().slice(0, 10);
-  useEffect(function () {
+  var loadData = function loadData() {
     Promise.all([sb.from("tasks").select("*"), sb.from("members").select("*"), sb.from("projects").select("*"), sb.from("columns").select("*")]).then(function (_ref21) {
       var _ref22 = _slicedToArray(_ref21, 4),
         t = _ref22[0],
         mem = _ref22[1],
         proj = _ref22[2],
         col = _ref22[3];
-      if (Array.isArray(t) && t.length > 0) setTasks(t.map(toTask).filter(Boolean));
+      if (Array.isArray(t)) setTasks(t.map(toTask).filter(Boolean));
       if (Array.isArray(mem) && mem.length > 0) setMembers(mem.map(toMember).filter(Boolean));
       if (Array.isArray(proj) && proj.length > 0) setProjects(proj.map(toProject).filter(Boolean));
       if (Array.isArray(col) && col.length > 0) setColumns(col.map(toColumn).filter(Boolean));
     }).catch(function (e) {
       return console.error("Load error:", e);
     });
-  }, []);
+  };
+
   // Guard: remove any undefined/null items from tasks
   var safeTasks = tasks.filter(function (x) {
     return x != null;
@@ -5174,42 +5175,78 @@ function App() {
       return x.id === id;
     });
   };
-  var addTask = function addTask() {
-    var _columns$;
-    if (!newTask.title.trim()) return;
-    var safe = _objectSpread(_objectSpread({
-      description: "",
-      startDate: "",
-      dueDate: "",
-      hours: 1,
-      tags: [],
-      comments: [],
-      assigneeIds: [newTask.assigneeId || 1]
-    }, newTask), {}, {
-      id: Date.now()
-    });
-    toast("✅", "Task Created", newTask.title);
-    setNewTask({
-      title: "",
-      projectId: 1,
-      assigneeId: 1,
-      assigneeIds: [1],
-      tags: [],
-      comments: [],
-      status: ((_columns$ = columns[0]) === null || _columns$ === void 0 ? void 0 : _columns$.id) || "todo",
-      priority: "medium",
-      hours: 2,
-      startDate: "",
-      dueDate: "",
-      description: ""
-    });
-    setShowAddTask(false);
-  };
-  var deleteTask = /*#__PURE__*/function () {
-    var _ref23 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee7(id) {
-      var _t7;
+  var addTask = /*#__PURE__*/function () {
+    var _ref23 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee7() {
+      var _columns$;
+      var safe, title, _t7;
       return _regenerator().w(function (_context7) {
         while (1) switch (_context7.p = _context7.n) {
+          case 0:
+            if (newTask.title.trim()) {
+              _context7.n = 1;
+              break;
+            }
+            return _context7.a(2);
+          case 1:
+            safe = _objectSpread({
+              description: "",
+              startDate: "",
+              dueDate: "",
+              hours: 1,
+              tags: [],
+              comments: [],
+              assigneeIds: [newTask.assigneeId || 1]
+            }, newTask);
+            title = safe.title;
+            setNewTask({
+              title: "",
+              projectId: 1,
+              assigneeId: 1,
+              assigneeIds: [1],
+              tags: [],
+              comments: [],
+              status: ((_columns$ = columns[0]) === null || _columns$ === void 0 ? void 0 : _columns$.id) || "todo",
+              priority: "medium",
+              hours: 2,
+              startDate: "",
+              dueDate: "",
+              description: ""
+            });
+            setShowAddTask(false);
+            _context7.p = 2;
+            _context7.n = 3;
+            return sb.from("tasks").insert(fromTask(safe));
+          case 3:
+            _context7.n = 4;
+            return loadData();
+          case 4:
+            toast("✅", "Task Created", title);
+            _context7.n = 6;
+            break;
+          case 5:
+            _context7.p = 5;
+            _t7 = _context7.v;
+            console.error("addTask error:", _t7);
+            setTasks(function (p) {
+              return [].concat(_toConsumableArray(p), [_objectSpread(_objectSpread({}, safe), {}, {
+                id: Date.now()
+              })]);
+            });
+            toast("✅", "Task Created", title);
+          case 6:
+            return _context7.a(2);
+        }
+      }, _callee7, null, [[2, 5]]);
+    }));
+    return function addTask() {
+      return _ref23.apply(this, arguments);
+    };
+  }();
+  var deleteTask = /*#__PURE__*/function () {
+    var _ref24 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee8(id) {
+      var _t8;
+      return _regenerator().w(function (_context8) {
+        while (1) switch (_context8.p = _context8.n) {
           case 0:
             setTasks(function (p) {
               return p.filter(function (x) {
@@ -5218,29 +5255,32 @@ function App() {
             });
             toast("🗑", "Deleted", "Task removed");
             setEditTask(null);
-            _context7.p = 1;
-            _context7.n = 2;
+            _context8.p = 1;
+            _context8.n = 2;
             return sb.from("tasks").delete().eq("id", id);
           case 2:
-            _context7.n = 4;
-            break;
+            _context8.n = 3;
+            return loadData();
           case 3:
-            _context7.p = 3;
-            _t7 = _context7.v;
+            _context8.n = 5;
+            break;
           case 4:
-            return _context7.a(2);
+            _context8.p = 4;
+            _t8 = _context8.v;
+          case 5:
+            return _context8.a(2);
         }
-      }, _callee7, null, [[1, 3]]);
+      }, _callee8, null, [[1, 4]]);
     }));
     return function deleteTask(_x3) {
-      return _ref23.apply(this, arguments);
+      return _ref24.apply(this, arguments);
     };
   }();
   var saveEdit = /*#__PURE__*/function () {
-    var _ref24 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee8() {
-      var _t8;
-      return _regenerator().w(function (_context8) {
-        while (1) switch (_context8.p = _context8.n) {
+    var _ref25 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee9() {
+      var _t9;
+      return _regenerator().w(function (_context9) {
+        while (1) switch (_context9.p = _context9.n) {
           case 0:
             setTasks(function (p) {
               return p.map(function (x) {
@@ -5249,22 +5289,25 @@ function App() {
             });
             toast("💾", "Saved", editTask.title);
             setEditTask(null);
-            _context8.p = 1;
-            _context8.n = 2;
+            _context9.p = 1;
+            _context9.n = 2;
             return sb.from("tasks").update(fromTask(editTask)).eq("id", editTask.id);
           case 2:
-            _context8.n = 4;
-            break;
+            _context9.n = 3;
+            return loadData();
           case 3:
-            _context8.p = 3;
-            _t8 = _context8.v;
+            _context9.n = 5;
+            break;
           case 4:
-            return _context8.a(2);
+            _context9.p = 4;
+            _t9 = _context9.v;
+          case 5:
+            return _context9.a(2);
         }
-      }, _callee8, null, [[1, 3]]);
+      }, _callee9, null, [[1, 4]]);
     }));
     return function saveEdit() {
-      return _ref24.apply(this, arguments);
+      return _ref25.apply(this, arguments);
     };
   }();
   var startEditCol = function startEditCol(col) {
