@@ -704,7 +704,7 @@ function buildDashboard(){
     const pct=tasks.length?Math.round((count/tasks.length)*100):0;
     const donePct=count?Math.round((done/count)*100):0;
     const row=div({style:{marginBottom:14}});
-    row.appendChild(div({style:{display:"flex",justifyContent:"space-between",marginBottom:5}});
+    row.appendChild(div({style:{display:"flex",justifyContent:"space-between",marginBottom:5}}));
     row.lastChild.appendChild(span({style:{fontSize:13,color:T.label,fontWeight:500}},[`${p.emoji||""} ${p.name}`]));
     row.lastChild.appendChild(span({style:{fontSize:12,color:T.label2}},[`${done}/${count} done`]));
     const track=div({style:{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:6,height:7,overflow:"hidden",position:"relative"}});
@@ -999,7 +999,7 @@ function buildCEO(){
     hdr.appendChild(span({style:{fontSize:11,fontWeight:700,color:ov>0?T.red:T.green,background:(ov>0?T.red:T.green)+"18",borderRadius:20,padding:"2px 10px"}},[ov>0?`${ov} overdue`:"On track ✓"]));
     c.appendChild(hdr);
     const track1=div({style:{marginBottom:10}});
-    track1.appendChild(div({style:{display:"flex",justifyContent:"space-between",marginBottom:4}});
+    track1.appendChild(div({style:{display:"flex",justifyContent:"space-between",marginBottom:4}}));
     track1.lastChild.appendChild(span({style:{fontSize:11,color:T.label2}},["Completion"]));
     track1.lastChild.appendChild(span({style:{fontSize:11,fontWeight:700,color:T.label}},[`${donePct}% (${done}/${teamTasks.length})`]));
     const pb1=div({style:{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:6,height:6,overflow:"hidden"}});
@@ -1007,7 +1007,7 @@ function buildCEO(){
     track1.appendChild(pb1);
     c.appendChild(track1);
     const track2=div({style:{marginBottom:12}});
-    track2.appendChild(div({style:{display:"flex",justifyContent:"space-between",marginBottom:4}});
+    track2.appendChild(div({style:{display:"flex",justifyContent:"space-between",marginBottom:4}}));
     track2.lastChild.appendChild(span({style:{fontSize:11,color:T.label2}},["Workload"]));
     track2.lastChild.appendChild(span({style:{fontSize:11,fontWeight:700,color}},[`${wlPct}%`]));
     const pb2=div({style:{background:T.bg2,border:`1px solid ${T.border}`,borderRadius:6,height:6,overflow:"hidden"}});
