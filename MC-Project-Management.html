@@ -2876,7 +2876,8 @@ function ManageTeamModal(_ref1) {
     cardStyle = _ref1.cardStyle,
     inp = _ref1.inp,
     onClose = _ref1.onClose,
-    toast = _ref1.toast;
+    toast = _ref1.toast,
+    onReload = _ref1.onReload;
   var _useState27 = useState(null),
     _useState28 = _slicedToArray(_useState27, 2),
     editingId = _useState28[0],
@@ -2941,6 +2942,7 @@ function ManageTeamModal(_ref1) {
             _context.n = 3;
             return sb.from("members").update(updated).eq("id", editingId);
           case 3:
+            if (onReload) onReload();
             _context.n = 5;
             break;
           case 4:
@@ -2982,6 +2984,7 @@ function ManageTeamModal(_ref1) {
             _context2.n = 3;
             return sb.from("members").delete().eq("id", id);
           case 3:
+            if (onReload) onReload();
             _context2.n = 5;
             break;
           case 4:
@@ -3037,6 +3040,7 @@ function ManageTeamModal(_ref1) {
               })]);
             });
           case 5:
+            if (onReload) onReload();
             toast("✅", "Member Added", newForm.name);
             setNewForm({
               name: "",
@@ -3541,7 +3545,8 @@ function ManageSpacesModal(_ref14) {
     inp = _ref14.inp,
     onClose = _ref14.onClose,
     setFilterProject = _ref14.setFilterProject,
-    toast = _ref14.toast;
+    toast = _ref14.toast,
+    onReload = _ref14.onReload;
   var _useState35 = useState(null),
     _useState36 = _slicedToArray(_useState35, 2),
     editingId = _useState36[0],
@@ -3603,6 +3608,7 @@ function ManageSpacesModal(_ref14) {
             _context4.n = 3;
             return sb.from("projects").update(updated).eq("id", editingId);
           case 3:
+            if (onReload) onReload();
             _context4.n = 5;
             break;
           case 4:
@@ -3696,6 +3702,7 @@ function ManageSpacesModal(_ref14) {
               })]);
             });
           case 5:
+            if (onReload) onReload();
             toast("✅", "Space Created", newForm.name);
             setNewForm({
               name: "",
@@ -4661,19 +4668,19 @@ function App() {
   var m = THEMES[isDark ? "dark" : "light"];
   var cardStyle = makeCardStyle(m);
   var inp = makeInp(m);
-  var _useState49 = useState(INITIAL_TASKS),
+  var _useState49 = useState([]),
     _useState50 = _slicedToArray(_useState49, 2),
     tasks = _useState50[0],
     setTasks = _useState50[1];
-  var _useState51 = useState(INITIAL_MEMBERS),
+  var _useState51 = useState([]),
     _useState52 = _slicedToArray(_useState51, 2),
     members = _useState52[0],
     setMembers = _useState52[1];
-  var _useState53 = useState(INITIAL_PROJECTS),
+  var _useState53 = useState([]),
     _useState54 = _slicedToArray(_useState53, 2),
     projects = _useState54[0],
     setProjects = _useState54[1];
-  var _useState55 = useState(INITIAL_COLUMNS),
+  var _useState55 = useState([]),
     _useState56 = _slicedToArray(_useState55, 2),
     columns = _useState56[0],
     setColumns = _useState56[1];
@@ -4809,13 +4816,16 @@ function App() {
         proj = _ref22[2],
         col = _ref22[3];
       if (Array.isArray(t)) setTasks(t.map(toTask).filter(Boolean));
-      if (Array.isArray(mem) && mem.length > 0) setMembers(mem.map(toMember).filter(Boolean));
-      if (Array.isArray(proj) && proj.length > 0) setProjects(proj.map(toProject).filter(Boolean));
-      if (Array.isArray(col) && col.length > 0) setColumns(col.map(toColumn).filter(Boolean));
+      if (Array.isArray(mem)) setMembers(mem.length > 0 ? mem.map(toMember).filter(Boolean) : []);
+      if (Array.isArray(proj)) setProjects(proj.length > 0 ? proj.map(toProject).filter(Boolean) : []);
+      if (Array.isArray(col)) setColumns(col.length > 0 ? col.map(toColumn).filter(Boolean) : INITIAL_COLUMNS);
     }).catch(function (e) {
       return console.error("Load error:", e);
     });
   };
+  useEffect(function () {
+    loadData();
+  }, []);
 
   // Guard: remove any undefined/null items from tasks
   var safeTasks = tasks.filter(function (x) {
@@ -7019,7 +7029,8 @@ function App() {
       return setShowManageSpaces(false);
     },
     setFilterProject: setFilterProject,
-    toast: toast
+    toast: toast,
+    onReload: loadData
   }), showManageTeam && /*#__PURE__*/React.createElement(ManageTeamModal, {
     members: members,
     setMembers: setMembers,
@@ -7030,7 +7041,8 @@ function App() {
     onClose: function onClose() {
       return setShowManageTeam(false);
     },
-    toast: toast
+    toast: toast,
+    onReload: loadData
   }), showManageCols && /*#__PURE__*/React.createElement("div", {
     style: {
       position: "fixed",
