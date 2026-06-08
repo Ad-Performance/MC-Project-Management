@@ -1531,6 +1531,220 @@ function TaskPanel(_ref6) {
         color: mem.color
       }
     }, "\u2713"));
+  }))), /*#__PURE__*/React.createElement(Field, {
+    label: "Tags"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      flexWrap: "wrap",
+      gap: 6,
+      marginBottom: 8
+    }
+  }, (task.tags || []).map(function (tag) {
+    return /*#__PURE__*/React.createElement("div", {
+      key: tag,
+      style: {
+        display: "flex",
+        alignItems: "center",
+        gap: 0,
+        borderRadius: 20,
+        border: "1.5px solid ".concat(m.accent),
+        background: m.accent + "18",
+        overflow: "hidden"
+      }
+    }, (editingTag === null || editingTag === void 0 ? void 0 : editingTag.old) === tag ? /*#__PURE__*/React.createElement("input", {
+      autoFocus: true,
+      value: editingTag.value,
+      onChange: function onChange(e) {
+        return setEditingTag(_objectSpread(_objectSpread({}, editingTag), {}, {
+          value: e.target.value
+        }));
+      },
+      onBlur: saveEditTag,
+      onKeyDown: function onKeyDown(e) {
+        if (e.key === "Enter") saveEditTag();
+        if (e.key === "Escape") setEditingTag(null);
+      },
+      style: {
+        border: "none",
+        background: "transparent",
+        color: m.accent,
+        fontSize: 12,
+        fontWeight: 600,
+        padding: "4px 8px",
+        outline: "none",
+        width: 80,
+        fontFamily: FONT
+      }
+    }) : /*#__PURE__*/React.createElement("span", {
+      onClick: function onClick() {
+        return setEditingTag({
+          old: tag,
+          value: tag
+        });
+      },
+      style: {
+        fontSize: 12,
+        color: m.accent,
+        fontWeight: 600,
+        padding: "4px 10px",
+        cursor: "text"
+      }
+    }, tag), /*#__PURE__*/React.createElement("button", {
+      onClick: function onClick() {
+        return removeTag(tag);
+      },
+      style: {
+        background: "none",
+        border: "none",
+        color: m.accent,
+        cursor: "pointer",
+        fontSize: 14,
+        padding: "0 8px 0 0",
+        lineHeight: 1,
+        opacity: 0.6,
+        fontFamily: FONT
+      },
+      onMouseEnter: function onMouseEnter(e) {
+        return e.currentTarget.style.opacity = "1";
+      },
+      onMouseLeave: function onMouseLeave(e) {
+        return e.currentTarget.style.opacity = "0.6";
+      }
+    }, "\xD7"));
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "relative"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      borderRadius: 20,
+      border: "1.5px dashed ".concat(m.border),
+      overflow: "hidden",
+      background: "transparent"
+    }
+  }, /*#__PURE__*/React.createElement("input", {
+    value: newTagInput,
+    onChange: function onChange(e) {
+      setNewTagInput(e.target.value);
+      setShowTagSuggestions(true);
+    },
+    onKeyDown: function onKeyDown(e) {
+      if (e.key === "Enter") addCustomTag();
+      if (e.key === "Escape") {
+        setNewTagInput("");
+        setShowTagSuggestions(false);
+      }
+    },
+    onFocus: function onFocus() {
+      return setShowTagSuggestions(true);
+    },
+    onBlur: function onBlur() {
+      return setTimeout(function () {
+        return setShowTagSuggestions(false);
+      }, 150);
+    },
+    placeholder: "+ Add tag",
+    style: {
+      border: "none",
+      background: "transparent",
+      color: m.label2,
+      fontSize: 12,
+      padding: "4px 10px",
+      outline: "none",
+      width: 90,
+      fontFamily: FONT
+    }
+  }), newTagInput && /*#__PURE__*/React.createElement("button", {
+    onClick: addCustomTag,
+    style: {
+      background: "none",
+      border: "none",
+      color: m.accent,
+      cursor: "pointer",
+      fontSize: 12,
+      padding: "0 8px",
+      fontWeight: 700,
+      fontFamily: FONT
+    }
+  }, "+")), showTagSuggestions && suggestions.length > 0 && /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "absolute",
+      top: "100%",
+      left: 0,
+      marginTop: 4,
+      background: m.card,
+      border: "1px solid ".concat(m.border),
+      borderRadius: 10,
+      boxShadow: m.shadowMd,
+      zIndex: 10,
+      minWidth: 140,
+      overflow: "hidden"
+    }
+  }, suggestions.map(function (s) {
+    return /*#__PURE__*/React.createElement("div", {
+      key: s,
+      onClick: function onClick() {
+        toggleTag(s);
+        setNewTagInput("");
+        setShowTagSuggestions(false);
+      },
+      style: {
+        padding: "8px 14px",
+        cursor: "pointer",
+        fontSize: 13,
+        color: m.label,
+        transition: "background 0.1s"
+      },
+      onMouseEnter: function onMouseEnter(e) {
+        return e.currentTarget.style.background = m.bg2;
+      },
+      onMouseLeave: function onMouseLeave(e) {
+        return e.currentTarget.style.background = "transparent";
+      }
+    }, s);
+  })))), (task.tags || []).length < ALL_TAGS.length && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      color: m.label3,
+      marginBottom: 5
+    }
+  }, "Quick add:"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      flexWrap: "wrap",
+      gap: 5
+    }
+  }, ALL_TAGS.filter(function (t) {
+    return !(task.tags || []).includes(t);
+  }).slice(0, 6).map(function (tag) {
+    return /*#__PURE__*/React.createElement("button", {
+      key: tag,
+      onClick: function onClick() {
+        return toggleTag(tag);
+      },
+      style: {
+        padding: "3px 10px",
+        borderRadius: 20,
+        border: "1px solid ".concat(m.border),
+        background: "transparent",
+        color: m.label3,
+        fontSize: 11,
+        cursor: "pointer",
+        fontFamily: FONT,
+        transition: "all 0.15s"
+      },
+      onMouseEnter: function onMouseEnter(e) {
+        e.currentTarget.style.borderColor = m.accent;
+        e.currentTarget.style.color = m.accent;
+      },
+      onMouseLeave: function onMouseLeave(e) {
+        e.currentTarget.style.borderColor = m.border;
+        e.currentTarget.style.color = m.label3;
+      }
+    }, "+ ", tag);
   })))), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "grid",
@@ -2662,8 +2876,7 @@ function ManageTeamModal(_ref1) {
     cardStyle = _ref1.cardStyle,
     inp = _ref1.inp,
     onClose = _ref1.onClose,
-    toast = _ref1.toast,
-    onReload = _ref1.onReload;
+    toast = _ref1.toast;
   var _useState27 = useState(null),
     _useState28 = _slicedToArray(_useState27, 2),
     editingId = _useState28[0],
@@ -3328,8 +3541,7 @@ function ManageSpacesModal(_ref14) {
     inp = _ref14.inp,
     onClose = _ref14.onClose,
     setFilterProject = _ref14.setFilterProject,
-    toast = _ref14.toast,
-    onReload = _ref14.onReload;
+    toast = _ref14.toast;
   var _useState35 = useState(null),
     _useState36 = _slicedToArray(_useState35, 2),
     editingId = _useState36[0],
@@ -4597,9 +4809,9 @@ function App() {
         proj = _ref22[2],
         col = _ref22[3];
       if (Array.isArray(t)) setTasks(t.map(toTask).filter(Boolean));
-      if (Array.isArray(mem)) setMembers(mem.length > 0 ? mem.map(toMember).filter(Boolean) : []);
-      if (Array.isArray(proj)) setProjects(proj.length > 0 ? proj.map(toProject).filter(Boolean) : []);
-      if (Array.isArray(col)) setColumns(col.length > 0 ? col.map(toColumn).filter(Boolean) : []);
+      if (Array.isArray(mem) && mem.length > 0) setMembers(mem.map(toMember).filter(Boolean));
+      if (Array.isArray(proj) && proj.length > 0) setProjects(proj.map(toProject).filter(Boolean));
+      if (Array.isArray(col) && col.length > 0) setColumns(col.map(toColumn).filter(Boolean));
     }).catch(function (e) {
       return console.error("Load error:", e);
     });
@@ -4693,9 +4905,9 @@ function App() {
             title = safe.title;
             setNewTask({
               title: "",
-              projectId: projects[0] ? projects[0].id : null,
-              assigneeId: members[0] ? members[0].id : null,
-              assigneeIds: members[0] ? [members[0].id] : [],
+              projectId: projects.length > 0 ? projects[0].id : null,
+              assigneeId: members.length > 0 ? members[0].id : null,
+              assigneeIds: members.length > 0 ? [members[0].id] : [],
               tags: [],
               comments: [],
               status: ((_columns$ = columns[0]) === null || _columns$ === void 0 ? void 0 : _columns$.id) || "todo",
@@ -4970,7 +5182,15 @@ function App() {
     }
   }, /*#__PURE__*/React.createElement("button", {
     onClick: function onClick() {
-      setNewTask({title:"",description:"",projectId:projects[0]?projects[0].id:null,assigneeId:members[0]?members[0].id:null,assigneeIds:members[0]?[members[0].id]:[],status:columns[0]?columns[0].id:"todo",priority:"medium",hours:2,startDate:"",dueDate:"",tags:[],comments:[]});
+      setNewTask({
+        title: "", description: "",
+        projectId: projects.length > 0 ? projects[0].id : null,
+        assigneeId: members.length > 0 ? members[0].id : null,
+        assigneeIds: members.length > 0 ? [members[0].id] : [],
+        status: columns.length > 0 ? columns[0].id : null,
+        priority: "medium", hours: 2,
+        startDate: "", dueDate: "", tags: [], comments: []
+      });
       setShowAddTask(true);
     },
     style: {
@@ -6810,8 +7030,7 @@ function App() {
       return setShowManageSpaces(false);
     },
     setFilterProject: setFilterProject,
-    toast: toast,
-    onReload: loadData
+    toast: toast
   }), showManageTeam && /*#__PURE__*/React.createElement(ManageTeamModal, {
     members: members,
     setMembers: setMembers,
@@ -6822,8 +7041,7 @@ function App() {
     onClose: function onClose() {
       return setShowManageTeam(false);
     },
-    toast: toast,
-    onReload: loadData
+    toast: toast
   }), showManageCols && /*#__PURE__*/React.createElement("div", {
     style: {
       position: "fixed",
