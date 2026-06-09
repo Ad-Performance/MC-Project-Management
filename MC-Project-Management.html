@@ -883,14 +883,17 @@ function TaskFields(_ref5) {
       marginBottom: 5
     }
   }, "Assignee"), /*#__PURE__*/React.createElement("select", {
-    value: task.assigneeId,
+    value: task.assigneeId || "",
     onChange: function onChange(e) {
+      var val = e.target.value;
       return setTask(_objectSpread(_objectSpread({}, task), {}, {
-        assigneeId: parseInt(e.target.value)
+        assigneeId: val ? parseInt(val) : null,
+        assigneeIds: val ? [parseInt(val)] : []
       }));
     },
     style: inp
-  }, members.map(function (x) {
+  }, /*#__PURE__*/React.createElement("option", { value: "" }, "— Select assignee —"),
+  members.map(function (x) {
     return /*#__PURE__*/React.createElement("option", {
       key: x.id,
       value: x.id
@@ -2697,7 +2700,8 @@ function ManageTeamModal(_ref1) {
       name: mem.name,
       avatar: mem.avatar,
       color: mem.color,
-      capacity: mem.capacity
+      capacity: mem.capacity,
+      teams: mem.teams || []
     });
   };
   var saveEdit = /*#__PURE__*/function () {
@@ -4695,8 +4699,8 @@ function App() {
             setNewTask({
               title: "",
               projectId: projects.length > 0 ? projects[0].id : null,
-              assigneeId: members.length > 0 ? members[0].id : null,
-              assigneeIds: members.length > 0 ? [members[0].id] : [],
+              assigneeId: null,
+              assigneeIds: [],
               tags: [],
               comments: [],
               status: ((_columns$ = columns[0]) === null || _columns$ === void 0 ? void 0 : _columns$.id) || "todo",
@@ -4995,8 +4999,8 @@ function App() {
       setNewTask({
         title: "", description: "",
         projectId: projects.length > 0 ? projects[0].id : null,
-        assigneeId: members.length > 0 ? members[0].id : null,
-        assigneeIds: members.length > 0 ? [members[0].id] : [],
+        assigneeId: null,
+        assigneeIds: [],
         status: columns.length > 0 ? columns[0].id : null,
         priority: "medium", hours: 2,
         startDate: "", dueDate: "", tags: [], comments: []
