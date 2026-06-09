@@ -157,7 +157,8 @@ var toColumn = function toColumn(r) {
   return r ? {
     id: r.id,
     label: r.label,
-    color: r.color
+    color: r.color,
+    position: r.position || 0
   } : null;
 };
 var INITIAL_MEMBERS = [];
@@ -4599,7 +4600,7 @@ function App() {
       if (Array.isArray(t)) setTasks(t.map(toTask).filter(Boolean));
       if (Array.isArray(mem) && mem.length > 0) setMembers(mem.map(toMember).filter(Boolean));
       if (Array.isArray(proj) && proj.length > 0) setProjects(proj.map(toProject).filter(Boolean));
-      if (Array.isArray(col) && col.length > 0) setColumns(col.map(toColumn).filter(Boolean));
+      if (Array.isArray(col) && col.length > 0) setColumns(col.map(toColumn).filter(Boolean).sort(function(a,b){ return (a.position||0)-(b.position||0); }));
     }).catch(function (e) {
       return console.error("Load error:", e);
     });
@@ -4836,17 +4837,38 @@ function App() {
     setColumns(rest);
     setEditingColId(null);
   };
-  var addColumn = function addColumn() {
+  var moveColumn = async function moveColumn(colId, dir) {
+    var idx = columns.findIndex(function(c) { return c.id === colId; });
+    if (idx < 0) return;
+    var newIdx = idx + dir;
+    if (newIdx < 0 || newIdx >= columns.length) return;
+    var newCols = _toConsumableArray(columns);
+    var tmp = newCols[idx]; newCols[idx] = newCols[newIdx]; newCols[newIdx] = tmp;
+    newCols = newCols.map(function(c, i) { return Object.assign({}, c, { position: i }); });
+    setColumns(newCols);
+    try {
+      await Promise.all(newCols.map(function(c) {
+        return sb.from("columns").update({ position: c.position }).eq("id", c.id);
+      }));
+    } catch(e) { console.error("moveColumn error:", e); }
+  };
+
+  var addColumn = async function addColumn() {
     if (!newColLabel.trim()) return;
-    var id = newColLabel.toLowerCase().replace(/\s+/g, "_") + "_" + Date.now();
-    setColumns(function (p) {
-      return [].concat(_toConsumableArray(p), [{
-        id: id,
-        label: newColLabel,
-        color: newColColor
-      }]);
-    });
-    toast("➕", "Column Added", newColLabel);
+    var id = newColLabel.toLowerCase().replace(/\s+/g, "_").replace(/[^a-z0-9_]/g, "") + "_" + Date.now();
+    var newCol = { id: id, label: newColLabel, color: newColColor, position: columns.length };
+    try {
+      await sb.from("columns").insert([newCol]);
+      // Reload from Supabase to get correct data
+      var rows = await sb.from("columns").select("*");
+      if (Array.isArray(rows) && rows.length > 0) {
+        setColumns(rows.map(toColumn).filter(Boolean).sort(function(a,b){ return (a.position||0)-(b.position||0); }));
+      }
+      toast("➕", "Column Added", newColLabel);
+    } catch(e) {
+      console.error("addColumn error:", e);
+      toast("❌", "Error", "Could not add column");
+    }
     setNewColLabel("");
     setNewColColor("#64748B");
     setShowAddCol(false);
@@ -6909,7 +6931,17 @@ function App() {
         fontSize: 13,
         border: "1px solid ".concat(m.border)
       }
-    }, "Edit"), columns.length > 1 && /*#__PURE__*/React.createElement(Btn, {
+    }, "Edit"), /*#__PURE__*/React.createElement(Btn, {
+      onClick: function onClick() { return moveColumn(col.id, -1); },
+      bg: m.bg2,
+      color: m.label2,
+      style: { padding: "5px 8px", fontSize: 13, border: "1px solid ".concat(m.border) }
+    }, "↑"), /*#__PURE__*/React.createElement(Btn, {
+      onClick: function onClick() { return moveColumn(col.id, 1); },
+      bg: m.bg2,
+      color: m.label2,
+      style: { padding: "5px 8px", fontSize: 13, border: "1px solid ".concat(m.border) }
+    }, "↓"), columns.length > 1 && /*#__PURE__*/React.createElement(Btn, {
       onClick: function onClick() {
         return deleteCol(col.id);
       },
