@@ -1249,9 +1249,7 @@ function TaskPanel(_ref6) {
     setCommentText("");
     setShowMention(false);
     // Save to Supabase immediately
-    console.log("Saving comment, task.id:", task.id, "comments:", newComments);
     sb.from("tasks").update({ comments: newComments }).eq("id", task.id)
-      .then(function(r) { console.log("Comment saved:", r); })
       .catch(function(e) { console.error("Comment save error:", e); });
   };
   var Field = function Field(_ref7) {
@@ -4444,7 +4442,7 @@ function WorkloadTab(_ref20) {
 
 // ── Main App ──────────────────────────────────────────────
 function App() {
-  var _useState47 = useState(true),
+  var _useState47 = useState(false),
     _useState48 = _slicedToArray(_useState47, 2),
     isDark = _useState48[0],
     setIsDark = _useState48[1];
