@@ -1226,7 +1226,6 @@ function TaskPanel(_ref6) {
   };
   var addComment = function addComment() {
     if (!commentText.trim()) return;
-    // Extract mentioned names
     var mentioned = _toConsumableArray(commentText.matchAll(/@(\w+)/g)).map(function (m2) {
       return m2[1];
     });
@@ -1235,20 +1234,24 @@ function TaskPanel(_ref6) {
       author: "You",
       text: commentText,
       mentions: mentioned,
-      time: new Date().toLocaleTimeString("th-TH", {
+      time: new Date().toLocaleTimeString("en-GB", {
         hour: "2-digit",
         minute: "2-digit"
       }),
-      date: new Date().toLocaleDateString("th-TH", {
+      date: new Date().toLocaleDateString("en-GB", {
         day: "2-digit",
         month: "short"
       })
     };
-    setTask(_objectSpread(_objectSpread({}, task), {}, {
-      comments: [].concat(_toConsumableArray(task.comments || []), [comment])
-    }));
+    var newComments = [].concat(_toConsumableArray(task.comments || []), [comment]);
+    var updatedTask = _objectSpread(_objectSpread({}, task), {}, { comments: newComments });
+    setTask(updatedTask);
     setCommentText("");
     setShowMention(false);
+    // Save to Supabase immediately
+    sb.from("tasks").update({ comments: newComments }).eq("id", task.id).catch(function(e) {
+      console.error("Comment save error:", e);
+    });
   };
   var Field = function Field(_ref7) {
     var label = _ref7.label,
@@ -1617,9 +1620,9 @@ function TaskPanel(_ref6) {
   }, "\u26A0\uFE0F ", task.hours >= 40 ? "Over 1 week" : "Over 1 day", " \u2014 Are you sure this estimate is correct?")), /*#__PURE__*/React.createElement(Field, {
     label: "Description"
   }, /*#__PURE__*/React.createElement("textarea", {
-    value: task.description || "",
-    onChange: function onChange(e) {
-      return setTask(_objectSpread(_objectSpread({}, task), {}, {
+    defaultValue: task.description || "",
+    onBlur: function onBlur(e) {
+      setTask(_objectSpread(_objectSpread({}, task), {}, {
         description: e.target.value
       }));
     },
