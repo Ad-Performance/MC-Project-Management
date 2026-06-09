@@ -1249,9 +1249,10 @@ function TaskPanel(_ref6) {
     setCommentText("");
     setShowMention(false);
     // Save to Supabase immediately
-    sb.from("tasks").update({ comments: newComments }).eq("id", task.id).catch(function(e) {
-      console.error("Comment save error:", e);
-    });
+    console.log("Saving comment, task.id:", task.id, "comments:", newComments);
+    sb.from("tasks").update({ comments: newComments }).eq("id", task.id)
+      .then(function(r) { console.log("Comment saved:", r); })
+      .catch(function(e) { console.error("Comment save error:", e); });
   };
   var Field = function Field(_ref7) {
     var label = _ref7.label,
