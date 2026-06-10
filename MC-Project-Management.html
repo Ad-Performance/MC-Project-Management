@@ -882,23 +882,19 @@ function TaskFields(_ref5) {
       letterSpacing: 0.7,
       marginBottom: 5
     }
-  }, "Assignee"), /*#__PURE__*/React.createElement("select", {
-    value: task.assigneeId || "",
-    onChange: function onChange(e) {
-      var val = e.target.value;
-      return setTask(_objectSpread(_objectSpread({}, task), {}, {
-        assigneeId: val ? parseInt(val) : null,
-        assigneeIds: val ? [parseInt(val)] : []
-      }));
+  }, "Assignee"), /*#__PURE__*/React.createElement("input", {
+    key: "assignee-" + (task.assigneeId||"none"),
+    list: "assignee-opts",
+    defaultValue: task.assigneeId ? ((members.find(function(m){return m.id===task.assigneeId;})||{}).name||"") : "",
+    placeholder: "Search member...",
+    onBlur: function onBlur(e) {
+      var found = members.find(function(m){return m.name===e.target.value;});
+      if(found) setTask(_objectSpread(_objectSpread({},task),{},{assigneeId:found.id,assigneeIds:[found.id]}));
+      else if(!e.target.value) setTask(_objectSpread(_objectSpread({},task),{},{assigneeId:null,assigneeIds:[]}));
     },
     style: inp
-  }, /*#__PURE__*/React.createElement("option", { value: "" }, "— Select assignee —"),
-  members.map(function (x) {
-    return /*#__PURE__*/React.createElement("option", {
-      key: x.id,
-      value: x.id
-    }, x.name);
-  })))), /*#__PURE__*/React.createElement("div", {
+  }), /*#__PURE__*/React.createElement("datalist", {id:"assignee-opts"},
+    members.map(function(x){return /*#__PURE__*/React.createElement("option",{key:x.id,value:x.name});})))), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "grid",
       gridTemplateColumns: "1fr 1fr",
@@ -3362,10 +3358,11 @@ function ManageSpacesModal(_ref14) {
 
   var startEdit = function startEdit(p) {
     setEditingId(p.id);
+    setShowEmojiPicker(null);
     setEditForm({
       name: p.name,
-      emoji: p.emoji,
-      color: p.color
+      emoji: p.emoji || "📁",
+      color: p.color || "#3B82F6"
     });
   };
   var saveEdit = /*#__PURE__*/function () {
@@ -3737,6 +3734,7 @@ function ManageSpacesModal(_ref14) {
     return /*#__PURE__*/React.createElement("div", {
       key: p.id
     }, editingId === p.id ? /*#__PURE__*/React.createElement(FormRow, {
+      key: "edit-" + p.id,
       form: editForm,
       setForm: setEditForm,
       onSave: saveEdit,
@@ -4705,7 +4703,7 @@ function App() {
               comments: [],
               status: ((_columns$ = columns[0]) === null || _columns$ === void 0 ? void 0 : _columns$.id) || "todo",
               priority: "medium",
-              hours: 2,
+              hours: null,
               startDate: "",
               dueDate: "",
               description: ""
@@ -5002,7 +5000,7 @@ function App() {
         assigneeId: null,
         assigneeIds: [],
         status: columns.length > 0 ? columns[0].id : null,
-        priority: "medium", hours: 2,
+        priority: "medium", hours: null,
         startDate: "", dueDate: "", tags: [], comments: []
       });
       setShowAddTask(true);
@@ -5108,8 +5106,9 @@ function App() {
   }, "\u2699")), /*#__PURE__*/React.createElement("div", {
     style: {
       padding: "0 12px",
-      flex: 1,
-      overflowY: "auto"
+      flexShrink: 0,
+      overflowY: "auto",
+      maxHeight: 260
     }
   }, /*#__PURE__*/React.createElement("button", {
     onClick: function onClick() {
@@ -6953,7 +6952,8 @@ function App() {
       color: m.red,
       style: {
         padding: "5px 12px",
-        fontSize: 13
+        fontSize: 13,
+        minWidth: 72
       }
     }, "Delete"));
   }), /*#__PURE__*/React.createElement(Btn, {
