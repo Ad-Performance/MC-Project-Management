@@ -4824,7 +4824,7 @@ function App() {
     setEditingColLabel(col.label);
     setEditingColColor(col.color);
   };
-  var saveEditCol = function saveEditCol(id) {
+  var saveEditCol = async function saveEditCol(id) {
     if (!editingColLabel.trim()) return;
     setColumns(function (p) {
       return p.map(function (c) {
@@ -4836,21 +4836,26 @@ function App() {
     });
     toast("✏️", "Column Updated", editingColLabel);
     setEditingColId(null);
+    try {
+      await sb.from("columns").update({ label: editingColLabel, color: editingColColor }).eq("id", id);
+    } catch(e) { console.error("saveEditCol error:", e); }
   };
-  var deleteCol = function deleteCol(id) {
-    var rest = columns.filter(function (c) {
-      return c.id !== id;
-    });
+  var deleteCol = async function deleteCol(id) {
+    var rest = columns.filter(function (c) { return c.id !== id; });
     if (!rest.length) return;
+    var fallback = rest[0].id;
     setTasks(function (p) {
       return p.map(function (x) {
-        return x.status === id ? _objectSpread(_objectSpread({}, x), {}, {
-          status: rest[0].id
-        }) : x;
+        return x.status === id ? _objectSpread(_objectSpread({}, x), {}, { status: fallback }) : x;
       });
     });
     setColumns(rest);
     setEditingColId(null);
+    try {
+      // Move tasks to fallback column first, then delete
+      await sb.from("tasks").update({ status: fallback }).eq("status", id);
+      await sb.from("columns").delete().eq("id", id);
+    } catch(e) { console.error("deleteCol error:", e); }
   };
   var moveColumn = async function moveColumn(colId, dir) {
     var idx = columns.findIndex(function(c) { return c.id === colId; });
