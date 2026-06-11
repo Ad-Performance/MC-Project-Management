@@ -882,19 +882,23 @@ function TaskFields(_ref5) {
       letterSpacing: 0.7,
       marginBottom: 5
     }
-  }, "Assignee"), /*#__PURE__*/React.createElement("input", {
-    key: "assignee-" + (task.assigneeId||"none"),
-    list: "assignee-opts",
-    defaultValue: task.assigneeId ? ((members.find(function(m){return m.id===task.assigneeId;})||{}).name||"") : "",
-    placeholder: "Search member...",
-    onBlur: function onBlur(e) {
-      var found = members.find(function(m){return m.name===e.target.value;});
-      if(found) setTask(_objectSpread(_objectSpread({},task),{},{assigneeId:found.id,assigneeIds:[found.id]}));
-      else if(!e.target.value) setTask(_objectSpread(_objectSpread({},task),{},{assigneeId:null,assigneeIds:[]}));
+  }, "Assignee"), /*#__PURE__*/React.createElement("select", {
+    value: task.assigneeId || "",
+    onChange: function onChange(e) {
+      var val = e.target.value;
+      return setTask(_objectSpread(_objectSpread({}, task), {}, {
+        assigneeId: val ? parseInt(val) : null,
+        assigneeIds: val ? [parseInt(val)] : []
+      }));
     },
     style: inp
-  }), /*#__PURE__*/React.createElement("datalist", {id:"assignee-opts"},
-    members.map(function(x){return /*#__PURE__*/React.createElement("option",{key:x.id,value:x.name});})))), /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("option", { value: "" }, "— Select assignee —"),
+  members.map(function (x) {
+    return /*#__PURE__*/React.createElement("option", {
+      key: x.id,
+      value: x.id
+    }, x.name);
+  })))), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "grid",
       gridTemplateColumns: "1fr 1fr",
@@ -1429,20 +1433,7 @@ function TaskPanel(_ref6) {
       overflowY: "auto",
       padding: "16px 20px"
     }
-  }, activeSection === "details" && /*#__PURE__*/React.createElement("div", null,
-  /*#__PURE__*/React.createElement("div", {
-    style: { marginBottom: 16 }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: { fontSize: 11, fontWeight: 700, color: m.label2, textTransform: "uppercase", letterSpacing: 0.7, marginBottom: 6 }
-  }, "Project"), /*#__PURE__*/React.createElement("select", {
-    value: task.projectId || "",
-    onChange: function onChange(e) {
-      setTask(_objectSpread(_objectSpread({}, task), {}, { projectId: e.target.value ? parseInt(e.target.value) : null }));
-    },
-    style: inp
-  }, /*#__PURE__*/React.createElement("option", { value: "" }, "— Select project —"),
-  projects.map(function(p) { return /*#__PURE__*/React.createElement("option", { key: p.id, value: p.id }, p.emoji, " ", p.name); }))),
-  /*#__PURE__*/React.createElement("div", {
+  }, activeSection === "details" && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     style: {
       display: "grid",
       gridTemplateColumns: "1fr 1fr",
@@ -3371,11 +3362,10 @@ function ManageSpacesModal(_ref14) {
 
   var startEdit = function startEdit(p) {
     setEditingId(p.id);
-    setShowEmojiPicker(null);
     setEditForm({
       name: p.name,
-      emoji: p.emoji || "📁",
-      color: p.color || "#3B82F6"
+      emoji: p.emoji,
+      color: p.color
     });
   };
   var saveEdit = /*#__PURE__*/function () {
@@ -3747,7 +3737,6 @@ function ManageSpacesModal(_ref14) {
     return /*#__PURE__*/React.createElement("div", {
       key: p.id
     }, editingId === p.id ? /*#__PURE__*/React.createElement(FormRow, {
-      key: "edit-" + p.id,
       form: editForm,
       setForm: setEditForm,
       onSave: saveEdit,
@@ -4716,7 +4705,7 @@ function App() {
               comments: [],
               status: ((_columns$ = columns[0]) === null || _columns$ === void 0 ? void 0 : _columns$.id) || "todo",
               priority: "medium",
-              hours: null,
+              hours: 2,
               startDate: "",
               dueDate: "",
               description: ""
@@ -4824,7 +4813,7 @@ function App() {
     setEditingColLabel(col.label);
     setEditingColColor(col.color);
   };
-  var saveEditCol = async function saveEditCol(id) {
+  var saveEditCol = function saveEditCol(id) {
     if (!editingColLabel.trim()) return;
     setColumns(function (p) {
       return p.map(function (c) {
@@ -4836,26 +4825,21 @@ function App() {
     });
     toast("✏️", "Column Updated", editingColLabel);
     setEditingColId(null);
-    try {
-      await sb.from("columns").update({ label: editingColLabel, color: editingColColor }).eq("id", id);
-    } catch(e) { console.error("saveEditCol error:", e); }
   };
-  var deleteCol = async function deleteCol(id) {
-    var rest = columns.filter(function (c) { return c.id !== id; });
+  var deleteCol = function deleteCol(id) {
+    var rest = columns.filter(function (c) {
+      return c.id !== id;
+    });
     if (!rest.length) return;
-    var fallback = rest[0].id;
     setTasks(function (p) {
       return p.map(function (x) {
-        return x.status === id ? _objectSpread(_objectSpread({}, x), {}, { status: fallback }) : x;
+        return x.status === id ? _objectSpread(_objectSpread({}, x), {}, {
+          status: rest[0].id
+        }) : x;
       });
     });
     setColumns(rest);
     setEditingColId(null);
-    try {
-      // Move tasks to fallback column first, then delete
-      await sb.from("tasks").update({ status: fallback }).eq("status", id);
-      await sb.from("columns").delete().eq("id", id);
-    } catch(e) { console.error("deleteCol error:", e); }
   };
   var moveColumn = async function moveColumn(colId, dir) {
     var idx = columns.findIndex(function(c) { return c.id === colId; });
@@ -5018,7 +5002,7 @@ function App() {
         assigneeId: null,
         assigneeIds: [],
         status: columns.length > 0 ? columns[0].id : null,
-        priority: "medium", hours: null,
+        priority: "medium", hours: 2,
         startDate: "", dueDate: "", tags: [], comments: []
       });
       setShowAddTask(true);
@@ -5124,9 +5108,8 @@ function App() {
   }, "\u2699")), /*#__PURE__*/React.createElement("div", {
     style: {
       padding: "0 12px",
-      flexShrink: 0,
-      overflowY: "auto",
-      maxHeight: 260
+      flex: 1,
+      overflowY: "auto"
     }
   }, /*#__PURE__*/React.createElement("button", {
     onClick: function onClick() {
@@ -6970,8 +6953,7 @@ function App() {
       color: m.red,
       style: {
         padding: "5px 12px",
-        fontSize: 13,
-        minWidth: 72
+        fontSize: 13
       }
     }, "Delete"));
   }), /*#__PURE__*/React.createElement(Btn, {
