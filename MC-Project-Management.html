@@ -861,14 +861,15 @@ function TaskFields(_ref5) {
       marginBottom: 5
     }
   }, "Project"), /*#__PURE__*/React.createElement("select", {
-    value: task.projectId,
+    value: task.projectId || "",
     onChange: function onChange(e) {
       return setTask(_objectSpread(_objectSpread({}, task), {}, {
-        projectId: parseInt(e.target.value)
+        projectId: e.target.value ? parseInt(e.target.value) : null
       }));
     },
     style: inp
-  }, projects.map(function (p) {
+  }, /*#__PURE__*/React.createElement("option", { value: "" }, "— Select project —"),
+  projects.map(function (p) {
     return /*#__PURE__*/React.createElement("option", {
       key: p.id,
       value: p.id
@@ -893,7 +894,7 @@ function TaskFields(_ref5) {
     },
     style: inp
   }, /*#__PURE__*/React.createElement("option", { value: "" }, "— Select assignee —"),
-  members.map(function (x) {
+  [...members].sort(function(a,b){return a.name.localeCompare(b.name);}).map(function (x) {
     return /*#__PURE__*/React.createElement("option", {
       key: x.id,
       value: x.id
@@ -914,7 +915,7 @@ function TaskFields(_ref5) {
       marginBottom: 5
     }
   }, "Status"), /*#__PURE__*/React.createElement("select", {
-    value: task.status,
+    value: task.status || "",
     onChange: function onChange(e) {
       return setTask(_objectSpread(_objectSpread({}, task), {}, {
         status: e.target.value
@@ -936,7 +937,7 @@ function TaskFields(_ref5) {
       marginBottom: 5
     }
   }, "Priority"), /*#__PURE__*/React.createElement("select", {
-    value: task.priority,
+    value: task.priority || "",
     onChange: function onChange(e) {
       return setTask(_objectSpread(_objectSpread({}, task), {}, {
         priority: e.target.value
@@ -1493,7 +1494,7 @@ function TaskPanel(_ref6) {
       flexWrap: "wrap",
       gap: 8
     }
-  }, members.map(function (mem) {
+  }, [...members].sort(function(a,b){return a.name.localeCompare(b.name);}).map(function (mem) {
     var ids = task.assigneeIds || [task.assigneeId];
     var active = ids.includes(mem.id);
     return /*#__PURE__*/React.createElement("div", {
@@ -3151,7 +3152,7 @@ function ManageTeamModal(_ref1) {
       overflowY: "auto",
       padding: 16
     }
-  }, members.map(function (mem) {
+  }, [...members].sort(function(a,b){return a.name.localeCompare(b.name);}).map(function (mem) {
     return /*#__PURE__*/React.createElement("div", {
       key: mem.id
     }, editingId === mem.id ? /*#__PURE__*/React.createElement(MemberForm, {
@@ -4447,6 +4448,21 @@ function WorkloadTab(_ref20) {
 
 // ── Main App ──────────────────────────────────────────────
 function App() {
+  var _isMobile = useState(typeof window !== 'undefined' && window.innerWidth < 768),
+    _isMobileArr = _slicedToArray(_isMobile, 2),
+    isMobile = _isMobileArr[0], setIsMobile = _isMobileArr[1];
+  var _sidebarOpen = useState(typeof window !== 'undefined' && window.innerWidth >= 768),
+    _sidebarArr = _slicedToArray(_sidebarOpen, 2),
+    sidebarOpen = _sidebarArr[0], setSidebarOpen = _sidebarArr[1];
+  useEffect(function() {
+    function onResize() {
+      var mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      setSidebarOpen(!mobile);
+    }
+    window.addEventListener('resize', onResize);
+    return function() { window.removeEventListener('resize', onResize); };
+  }, []);
   var _useState47 = useState(false),
     _useState48 = _slicedToArray(_useState47, 2),
     isDark = _useState48[0],
@@ -4698,14 +4714,14 @@ function App() {
             title = safe.title;
             setNewTask({
               title: "",
-              projectId: projects.length > 0 ? projects[0].id : null,
+              projectId: null,
               assigneeId: null,
               assigneeIds: [],
               tags: [],
               comments: [],
-              status: ((_columns$ = columns[0]) === null || _columns$ === void 0 ? void 0 : _columns$.id) || "todo",
-              priority: "medium",
-              hours: 2,
+              status: null,
+              priority: null,
+              hours: null,
               startDate: "",
               dueDate: "",
               description: ""
@@ -4943,14 +4959,24 @@ function App() {
       fontFamily: FONT,
       overflow: "hidden"
     }
-  }, /*#__PURE__*/React.createElement("style", null, "\n        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');\n        * { box-sizing:border-box; }\n        @keyframes slideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}\n        @keyframes slideInRight{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}\n        ::-webkit-scrollbar{width:6px;height:6px}\n        ::-webkit-scrollbar-track{background:transparent}\n        ::-webkit-scrollbar-thumb{background:".concat(m.border, ";border-radius:3px}\n        select option{background:").concat(m.card, ";color:").concat(m.label, "}\n      ")), sidebarOpen && /*#__PURE__*/React.createElement("div", {
+  },
+  isMobile && sidebarOpen && /*#__PURE__*/React.createElement("div", {
+    onClick: function() { setSidebarOpen(false); },
+    style: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 99 }
+  }),
+  /*#__PURE__*/React.createElement("style", null, "\n        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');\n        * { box-sizing:border-box; }\n        @keyframes slideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}\n        @keyframes slideInRight{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}\n        ::-webkit-scrollbar{width:6px;height:6px}\n        ::-webkit-scrollbar-track{background:transparent}\n        ::-webkit-scrollbar-thumb{background:".concat(m.border, ";border-radius:3px}\n        select option{background:").concat(m.card, ";color:").concat(m.label, "}\n      ")), sidebarOpen && /*#__PURE__*/React.createElement("div", {
     style: {
-      width: 230,
+      width: isMobile ? "100%" : 230,
       background: m.sidebar,
       display: "flex",
       flexDirection: "column",
       flexShrink: 0,
-      borderRight: "1px solid ".concat(m.sidebarBorder)
+      borderRight: "1px solid ".concat(m.sidebarBorder),
+      position: isMobile ? "fixed" : "relative",
+      top: 0, left: 0,
+      height: "100vh",
+      zIndex: isMobile ? 100 : "auto",
+      overflowY: "auto"
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -5043,7 +5069,7 @@ function App() {
     return /*#__PURE__*/React.createElement("button", {
       key: item.id,
       onClick: function onClick() {
-        return setActiveTab(item.id);
+        setActiveTab(item.id); if(isMobile) setSidebarOpen(false); return;
       },
       style: {
         width: "100%",
@@ -5108,7 +5134,8 @@ function App() {
   }, "\u2699")), /*#__PURE__*/React.createElement("div", {
     style: {
       padding: "0 12px",
-      flex: 1,
+      flexShrink: 0,
+      maxHeight: 240,
       overflowY: "auto"
     }
   }, /*#__PURE__*/React.createElement("button", {
@@ -5252,7 +5279,7 @@ function App() {
     onMouseLeave: function onMouseLeave(e) {
       return e.currentTarget.style.color = "rgba(255,255,255,0.25)";
     }
-  }, "\u2699")), members.map(function (x) {
+  }, "\u2699")), [...members].sort(function(a,b){return a.name.localeCompare(b.name);}).map(function (x) {
     return /*#__PURE__*/React.createElement("div", {
       key: x.id,
       style: {
@@ -5356,7 +5383,7 @@ function App() {
       color: m.label2,
       cursor: "pointer",
       fontSize: 16,
-      display: "flex",
+      display: isMobile ? "flex" : sidebarOpen ? "none" : "flex",
       alignItems: "center",
       justifyContent: "center"
     }
@@ -5537,7 +5564,7 @@ function App() {
     })
   }, /*#__PURE__*/React.createElement("option", {
     value: "all"
-  }, "All Members"), members.map(function (x) {
+  }, "All Members"), [...members].sort(function(a,b){return a.name.localeCompare(b.name);}).map(function (x) {
     return /*#__PURE__*/React.createElement("option", {
       key: x.id,
       value: x.id
@@ -6554,7 +6581,7 @@ function App() {
       marginBottom: 18,
       color: m.label
     }
-  }, "Team Workload"), members.map(function (mem) {
+  }, "Team Workload"), [...members].sort(function(a,b){return a.name.localeCompare(b.name);}).map(function (mem) {
     var wl = getWorkload(mem.id);
     var color = wlColor(wl.pct);
     return /*#__PURE__*/React.createElement("div", {
