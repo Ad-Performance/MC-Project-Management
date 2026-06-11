@@ -4518,8 +4518,8 @@ function App() {
       tags: [],
       comments: [],
       status: null,
-      priority: "medium",
-      hours: 2,
+      priority: null,
+      hours: null,
       startDate: "",
       dueDate: "",
       description: ""
@@ -4927,7 +4927,7 @@ function App() {
   var NAV = [{
     id: "tasks",
     sym: "✓",
-    label: "My Tasks"
+    label: "Tasks"
   }, {
     id: "workload",
     sym: "⚡",
@@ -5028,7 +5028,7 @@ function App() {
         assigneeId: null,
         assigneeIds: [],
         status: columns.length > 0 ? columns[0].id : null,
-        priority: "medium", hours: 2,
+        priority: null, hours: null,
         startDate: "", dueDate: "", tags: [], comments: []
       });
       setShowAddTask(true);
@@ -5478,7 +5478,7 @@ function App() {
       flex: 1,
       letterSpacing: -0.3
     }
-  }, activeTab === "tasks" ? "My Tasks" : activeTab === "workload" ? "Workload" : activeTab === "ceo" ? "CEO View" : "Dashboard"), /*#__PURE__*/React.createElement("button", {
+  }, activeTab === "tasks" ? "Tasks" : activeTab === "workload" ? "Workload" : activeTab === "ceo" ? "CEO View" : "Dashboard"), /*#__PURE__*/React.createElement("button", {
     onClick: function onClick() {
       return setShowSearch(true);
     },
