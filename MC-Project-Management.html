@@ -1292,7 +1292,7 @@ function TaskPanel(_ref6) {
       top: 0,
       right: 0,
       bottom: 0,
-      width: isMobile ? "100%" : 480,
+      width: window.innerWidth < 520 ? window.innerWidth : window.innerWidth < 900 ? 420 : 480,
       background: m.card,
       zIndex: 101,
       display: "flex",
@@ -3700,8 +3700,8 @@ function ManageSpacesModal(_ref14) {
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: _objectSpread(_objectSpread({}, cardStyle), {}, {
-      width: isMobile ? "100vw" : 440,
-      maxHeight: isMobile ? "100vh" : "80vh",
+      width: window.innerWidth < 520 ? "95vw" : 440,
+      maxHeight: "88vh",
       display: "flex",
       flexDirection: "column",
       boxShadow: m.shadowLg
